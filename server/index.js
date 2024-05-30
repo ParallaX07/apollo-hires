@@ -34,6 +34,7 @@ async function run() {
         const bookings = client.db("ApolloHires").collection("bookings");
         const testimonials = client.db("ApolloHires").collection("testimonials");
         const faqs = client.db("ApolloHires").collection("faqs");
+        const reviews = client.db("ApolloHires").collection("reviews");
 
         //get number of documents in services collection
         app.get("/servicesCount", async (req, res) => {
@@ -154,6 +155,14 @@ async function run() {
             res.send(bookingsWithServiceInfo);
         });
 
+        //get reviews by service id
+        app.get("/reviews/:serviceId", async (req, res) => {
+            const serviceId = req.params.serviceId;
+            const result = await reviews.find({ serviceID: serviceId }).toArray();
+
+            res.send(result);
+        });
+
         //add services, only by logged in user
         app.post("/services", async (req, res) => {
             const service = req.body;
@@ -167,6 +176,15 @@ async function run() {
             const result = await bookings.insertOne(booking);
             res.send(result);
         });
+
+        //post reviews with service id example reviews
+        app.post("/reviews", async (req, res) => {
+            const review = req.body;
+            const result = await reviews.insertOne(review);
+            res.send(result);
+        });
+
+
 
         //update booking status
         app.put("/bookings/:id", async (req, res) => {
@@ -191,6 +209,14 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await services.deleteOne(query);
+            res.send(result);
+        });
+
+        //delete review by id
+        app.delete("/reviews/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await reviews.deleteOne(query);
             res.send(result);
         });
 
